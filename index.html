@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Calorie Project Journal</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .activity-btn.selected {
+      @apply bg-blue-500 text-white;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6 mt-8">
+    <h1 class="text-2xl font-bold text-center mb-4">Digital Calorie Project Journal</h1>
+    <div id="tabs" class="flex justify-center mb-4">
+      <button id="logTab" class="px-4 py-2 rounded-t-lg font-semibold bg-blue-100 text-blue-700">Log Entry</button>
+      <button id="summaryTab" class="px-4 py-2 rounded-t-lg font-semibold ml-2 bg-gray-100 text-gray-700">Summary</button>
+    </div>
+    <div id="logFormSection">
+      <form id="logForm">
+        <label class="block text-lg font-medium mb-2">How do you feel?</label>
+        <div class="flex space-x-4 mb-4">
+          <button type="button" class="mood-btn flex flex-col items-center px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-red-100" data-mood="bad">
+            <span class="text-2xl">😞</span>
+            <span class="text-xs mt-1">Bad</span>
+          </button>
+          <button type="button" class="mood-btn flex flex-col items-center px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-yellow-100" data-mood="neutral">
+            <span class="text-2xl">😐</span>
+            <span class="text-xs mt-1">Neutral</span>
+          </button>
+          <button type="button" class="mood-btn flex flex-col items-center px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-green-100" data-mood="positive">
+            <span class="text-2xl">🙂</span>
+            <span class="text-xs mt-1">Positive</span>
+          </button>
+        </div>
+        <input type="hidden" name="mood" id="moodInput" required>
+        <label class="block text-lg font-medium mb-2">What did you do? (Select all that apply)</label>
+        <div id="activityGroups" class="mb-4">
+          <!-- Activity groups will be injected here -->
+        </div>
+        <label class="block text-lg font-medium mb-2">Notes (optional)</label>
+        <textarea id="notes" class="w-full border border-gray-300 rounded-lg p-2 mb-4" rows="2" placeholder="How do you feel or what were you doing?"></textarea>
+        <button type="submit" class="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition">Submit</button>
+      </form>
+    </div>
+    <div id="summarySection" class="hidden">
+      <div class="mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold">Entries:</span>
+          <span id="entryCount">0</span>
+        </div>
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold">Mood Breakdown:</span>
+          <span id="moodBreakdown">-</span>
+        </div>
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold">Top Activities:</span>
+          <span id="topActivities">-</span>
+        </div>
+      </div>
+      <canvas id="moodChart" class="mb-4" height="120"></canvas>
+      <button id="clearDataBtn" class="w-full bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition">Clear Data</button>
+    </div>
+  </div>
+  <footer class="mt-8 text-gray-400 text-xs text-center">&copy; 2024 Digital Calorie Journal</footer>
+  <script>
+    // --- Activity Groups & Categories ---
+    const activityGroups = [
+      {
+        name: 'Productive / Purpose-Driven Activities',
+        color: 'blue',
+        activities: [
+          'Work / Career Tasks',
+          'Studying / Schoolwork',
+          'Learning New Skills',
+          'Creative Projects',
+          'Planning & Organizing',
+        ]
+      },
+      {
+        name: 'Self-Care & Mental Health',
+        color: 'green',
+        activities: [
+          'Mindfulness & Meditation',
+          'Fitness & Physical Health',
+          'Self-Monitoring / Tracking Usage',
+        ]
+      },
+      {
+        name: 'Social & Relational Activities',
+        color: 'yellow',
+        activities: [
+          'Texting / Messaging',
+          'Group Chats & Online Communities',
+          'Posting & Sharing Content',
+          "Browsing Others' Lives (Non-Comparative)",
+        ]
+      },
+      {
+        name: 'Emotionally Risky or Draining Use',
+        color: 'red',
+        activities: [
+          'Social Comparison / Envy Browsing',
+          'Doomscrolling / Bad News Consumption',
+          'Stalking / Obsessive Checking',
+          'Online Arguments / Debates',
+        ]
+      },
+      {
+        name: 'Leisure & Escapism',
+        color: 'purple',
+        activities: [
+          'Casual Browsing / Passive Scrolling',
+          'Gaming',
+          'Streaming / Video Watching',
+          'Shopping & Browsing Products',
+        ]
+      },
+    ];
+
+    // --- Color Class Mapping for Tailwind ---
+    const colorClassMap = {
+      blue: {
+        groupBg: 'bg-blue-100',
+        groupText: 'text-blue-800',
+        groupBorder: 'border-blue-200',
+        actsBg: 'bg-blue-50',
+        btnHover: 'hover:bg-blue-200',
+        btnSelected: 'bg-blue-500 text-white border-transparent',
+      },
+      green: {
+        groupBg: 'bg-green-100',
+        groupText: 'text-green-800',
+        groupBorder: 'border-green-200',
+        actsBg: 'bg-green-50',
+        btnHover: 'hover:bg-green-200',
+        btnSelected: 'bg-green-500 text-white border-transparent',
+      },
+      yellow: {
+        groupBg: 'bg-yellow-100',
+        groupText: 'text-yellow-800',
+        groupBorder: 'border-yellow-200',
+        actsBg: 'bg-yellow-50',
+        btnHover: 'hover:bg-yellow-200',
+        btnSelected: 'bg-yellow-500 text-white border-transparent',
+      },
+      red: {
+        groupBg: 'bg-red-100',
+        groupText: 'text-red-800',
+        groupBorder: 'border-red-200',
+        actsBg: 'bg-red-50',
+        btnHover: 'hover:bg-red-200',
+        btnSelected: 'bg-red-500 text-white border-transparent',
+      },
+      purple: {
+        groupBg: 'bg-purple-100',
+        groupText: 'text-purple-800',
+        groupBorder: 'border-purple-200',
+        actsBg: 'bg-purple-50',
+        btnHover: 'hover:bg-purple-200',
+        btnSelected: 'bg-purple-500 text-white border-transparent',
+      },
+    };
+
+    // --- DOM Elements ---
+    const activityGroupsDiv = document.getElementById('activityGroups');
+    const logForm = document.getElementById('logForm');
+    const moodBtns = document.querySelectorAll('.mood-btn');
+    const moodInput = document.getElementById('moodInput');
+    const notesInput = document.getElementById('notes');
+    const logFormSection = document.getElementById('logFormSection');
+    const summarySection = document.getElementById('summarySection');
+    const logTab = document.getElementById('logTab');
+    const summaryTab = document.getElementById('summaryTab');
+    const entryCount = document.getElementById('entryCount');
+    const moodBreakdown = document.getElementById('moodBreakdown');
+    const topActivities = document.getElementById('topActivities');
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    const moodChartCanvas = document.getElementById('moodChart');
+
+    // --- Render Activity Groups as Collapsible Sections ---
+    function renderActivityGroups() {
+      activityGroupsDiv.innerHTML = '';
+      const actsDivs = [];
+      const headers = [];
+      activityGroups.forEach((group, groupIdx) => {
+        const color = colorClassMap[group.color];
+        // Group container
+        const groupDiv = document.createElement('div');
+        groupDiv.className = `mb-2 rounded-lg shadow-sm`;
+        // Header
+        const header = document.createElement('button');
+        header.type = 'button';
+        header.className = `w-full flex justify-between items-center px-4 py-2 font-semibold ${color.groupText} ${color.groupBg} rounded-t-lg focus:outline-none`;
+        header.innerHTML = `<span>${group.name}</span><span class=\"ml-2\" id=\"arrow-${groupIdx}\">${groupIdx === 0 ? '▲' : '▼'}</span>`;
+        headers.push(header);
+        // Activities container
+        const actsDiv = document.createElement('div');
+        actsDiv.className = `flex flex-wrap gap-2 p-3 ${color.actsBg} border-t ${color.groupBorder}`;
+        actsDiv.style.display = groupIdx === 0 ? 'flex' : 'none'; // First group open by default
+        actsDivs.push(actsDiv);
+        group.activities.forEach(act => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `activity-btn px-3 py-1 rounded-full border border-gray-300 bg-white text-xs font-medium ${color.btnHover} focus:outline-none transition-colors`;
+          btn.textContent = act;
+          btn.dataset.label = act;
+          btn.addEventListener('click', () => {
+            btn.classList.toggle('selected');
+            if (btn.classList.contains('selected')) {
+              btn.classList.add(...color.btnSelected.split(' '));
+              btn.classList.remove('bg-white');
+            } else {
+              btn.classList.remove(...color.btnSelected.split(' '));
+              btn.classList.add('bg-white');
+            }
+          });
+          actsDiv.appendChild(btn);
+        });
+        // Collapsible logic (always keep one open)
+        header.addEventListener('click', () => {
+          if (actsDiv.style.display === 'flex') {
+            // If already open, do nothing
+            return;
+          }
+          // Close all activities containers
+          actsDivs.forEach((div, idx) => {
+            div.style.display = 'none';
+            headers[idx].querySelector('span:last-child').textContent = '▼';
+          });
+          // Open this one
+          actsDiv.style.display = 'flex';
+          header.querySelector('span:last-child').textContent = '▲';
+        });
+        groupDiv.appendChild(header);
+        groupDiv.appendChild(actsDiv);
+        activityGroupsDiv.appendChild(groupDiv);
+      });
+    }
+
+    // --- Mood Button Logic ---
+    moodBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        moodBtns.forEach(b => b.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-400'));
+        btn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-400');
+        moodInput.value = btn.dataset.mood;
+      });
+    });
+
+    // --- Tab Logic ---
+    logTab.addEventListener('click', () => {
+      logFormSection.classList.remove('hidden');
+      summarySection.classList.add('hidden');
+      logTab.classList.add('bg-blue-100', 'text-blue-700');
+      logTab.classList.remove('bg-gray-100', 'text-gray-700');
+      summaryTab.classList.remove('bg-blue-100', 'text-blue-700');
+      summaryTab.classList.add('bg-gray-100', 'text-gray-700');
+    });
+    summaryTab.addEventListener('click', () => {
+      logFormSection.classList.add('hidden');
+      summarySection.classList.remove('hidden');
+      summaryTab.classList.add('bg-blue-100', 'text-blue-700');
+      summaryTab.classList.remove('bg-gray-100', 'text-gray-700');
+      logTab.classList.remove('bg-blue-100', 'text-blue-700');
+      logTab.classList.add('bg-gray-100', 'text-gray-700');
+      renderSummary();
+    });
+
+    // --- Storage Helpers ---
+    const STORAGE_KEY = 'digitalCalorieJournalEntries';
+    function getEntries() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+    function saveEntry(entry) {
+      const entries = getEntries();
+      entries.push(entry);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+    function clearEntries() {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    // --- Form Submission ---
+    logForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const mood = moodInput.value;
+      if (!mood) {
+        alert('Please select how you feel.');
+        return;
+      }
+      const selectedActivities = Array.from(document.querySelectorAll('.activity-btn.selected')).map(btn => btn.dataset.label);
+      if (selectedActivities.length === 0) {
+        alert('Please select at least one activity.');
+        return;
+      }
+      const notes = notesInput.value.trim();
+      const entry = {
+        timestamp: new Date().toISOString(),
+        mood,
+        activities: selectedActivities,
+        notes
+      };
+      saveEntry(entry);
+      logForm.reset();
+      moodBtns.forEach(b => b.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-400'));
+      document.querySelectorAll('.activity-btn.selected').forEach(btn => {
+        btn.classList.remove('selected', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'text-white', 'border-transparent');
+        btn.classList.add('bg-white');
+      });
+      moodInput.value = '';
+      notesInput.value = '';
+      alert('Entry saved!');
+    });
+
+    // --- Summary Rendering ---
+    let moodChart;
+    function renderSummary() {
+      const entries = getEntries();
+      entryCount.textContent = entries.length;
+      // Mood breakdown
+      const moodCounts = { bad: 0, neutral: 0, positive: 0 };
+      entries.forEach(e => { if (e.mood in moodCounts) moodCounts[e.mood]++; });
+      moodBreakdown.textContent = `🙂 ${moodCounts.positive} | 😐 ${moodCounts.neutral} | 😞 ${moodCounts.bad}`;
+      // Top activities
+      const activityFreq = {};
+      entries.forEach(e => {
+        e.activities.forEach(act => {
+          activityFreq[act] = (activityFreq[act] || 0) + 1;
+        });
+      });
+      const sortedActs = Object.entries(activityFreq).sort((a, b) => b[1] - a[1]);
+      topActivities.textContent = sortedActs.length ? sortedActs.slice(0, 3).map(([act, n]) => `${act} (${n})`).join(', ') : '-';
+      // Chart
+      if (moodChart) moodChart.destroy();
+      moodChart = new Chart(moodChartCanvas, {
+        type: 'pie',
+        data: {
+          labels: ['Positive', 'Neutral', 'Bad'],
+          datasets: [{
+            data: [moodCounts.positive, moodCounts.neutral, moodCounts.bad],
+            backgroundColor: ['#34d399', '#fbbf24', '#f87171'],
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { display: true, position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    // --- Clear Data ---
+    clearDataBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all data?')) {
+        clearEntries();
+        renderSummary();
+      }
+    });
+
+    // --- Initial State ---
+    renderActivityGroups();
+    renderSummary();
+  </script>
+</body>
+</html> 
