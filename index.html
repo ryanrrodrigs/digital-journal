@@ -4,92 +4,240 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digital Calorie Project Journal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/1024px/1fada_color.png">
-  <link rel="apple-touch-icon" href="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/1024px/1fada_color.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Digital Calorie Project Journal">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      background: #eaf6fb;
-    }
-    .activity-btn.selected {
-      /* fallback for JS, but JS now handles classes */
-      background: #2563eb !important;
-      color: #fff !important;
-      border-color: transparent !important;
-    }
-    .mood-btn.selected {
-      background: #fbbf24 !important;
-      color: #222 !important;
-      border-color: transparent !important;
-    }
-    .card-dark {
-      background: #18181b;
-      color: #fff;
-    }
-    .card-light {
-      background: #fff;
+    html, body {
+      font-family: 'Nunito', 'Inter', Arial, sans-serif;
+      background: #fdf6ec;
       color: #222;
     }
-    .pill {
-      border-radius: 9999px;
-    }
-    .shadow-xl-custom {
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    .card-dark {
+      background: #fff;
+      color: #222;
+      border-radius: 2.5rem;
+      box-shadow: 0 6px 32px 0 rgba(31, 38, 135, 0.10);
+      border: 1.5px solid #f3e9d2;
     }
     .emoji-face {
-      font-size: 5rem;
-      display: block;
-      margin: 0 auto 1rem auto;
-      background: #fce7f3;
+      font-size: 6rem;
+      margin: 0 auto 1.5rem auto;
+      background: #fff7e6;
       border-radius: 50%;
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+      border: 6px solid #fff;
+    }
+    .pill {
+      border-radius: 9999px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .activity-btn.selected {
+      background: #222 !important;
+      color: #fff !important;
+      border-color: transparent !important;
+      box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+    }
+    .mood-btn.selected {
+      background: #ffe5a0 !important;
+      color: #222 !important;
+      border-color: transparent !important;
+      box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
+    }
+    .section-header {
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.5rem;
+      color: #222;
+      text-shadow: none;
+    }
+    .divider {
+      border: none;
+      border-top: 1.5px solid #f3e9d2;
+      margin: 1.5rem 0 1rem 0;
+    }
+    .input-app {
+      width: 100%;
+      border: 1.5px solid #f3e9d2;
+      background: #fff7e6;
+      color: #222;
+      border-radius: 1.5rem;
+      padding: 0.9rem 1.2rem 0.9rem 2.5rem;
+      font-size: 1.08rem;
+      font-family: inherit;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.04);
+      outline: none;
+      transition: border 0.2s;
+    }
+    .input-app:focus {
+      border: 1.5px solid #ffe5a0;
+      background: #fffbe9;
+    }
+    .input-app-icon {
+      position: absolute;
+      left: 0.7rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3rem;
+      color: #e0b96a;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .rounded-btn {
+      border-radius: 1.5rem;
+      background: #fff7e6;
+      color: #222;
+      border: 1.5px solid #f3e9d2;
+      font-weight: 700;
+      transition: background 0.15s, color 0.15s;
+    }
+    .rounded-btn:hover, .rounded-btn:focus {
+      background: #ffe5a0;
+      color: #222;
+    }
+    .bg-blue-400, .bg-green-400, .bg-gray-800 {
+      border-radius: 1.5rem !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.08) !important;
+    }
+    .bg-blue-400:hover, .bg-green-400:hover {
+      background: #ffe5a0 !important;
+      color: #222 !important;
+    }
+    .bg-gray-800:hover {
+      background: #ffe5a0 !important;
+      color: #222 !important;
+    }
+    textarea, .w-full {
+      border-radius: 1.5rem !important;
+      border: 1.5px solid #f3e9d2 !important;
+      background: #fff7e6 !important;
+      color: #222 !important;
+      font-family: inherit !important;
+    }
+    textarea:focus, .w-full:focus {
+      border: 1.5px solid #ffe5a0 !important;
+      background: #fffbe9 !important;
+    }
+    .heatmap-cell {
+      border-radius: 0.7rem;
+      border: 1.5px solid #f3e9d2;
+      background: #fff7e6;
+    }
+    .heatmap-cell.has-entry {
+      border: 2px solid #ffe5a0;
+    }
+    .heatmap-cell.level-1 { background: #ffe5a0; }
+    .heatmap-cell.level-2 { background: #ffe099; }
+    .heatmap-cell.level-3 { background: #ffd266; }
+    .heatmap-cell.level-4 { background: #ffc233; }
+    .heatmap-cell.level-5 { background: #ffb300; }
+    .heatmap-tooltip {
+      background: #fff7e6;
+      color: #222;
+      border-radius: 1.25rem;
+      border: 1.5px solid #f3e9d2;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    }
+    /* Dropdown (collapsible) group header restyle */
+    .activity-group-header {
+      background: #f9f3e7;
+      color: #222;
+      border: 1.5px solid #e7dbc6;
+      border-radius: 1.25rem 1.25rem 0 0;
+      box-shadow: 0 2px 8px 0 rgba(31,38,135,0.04);
+      font-weight: 700;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      outline: none;
+    }
+    .activity-group-header:hover, .activity-group-header:focus {
+      background: #f5ede0;
+      color: #222;
+      box-shadow: 0 4px 16px 0 rgba(31,38,135,0.08);
+    }
+    .activity-group-open {
+      background: #f3e9d2;
+      border-bottom: 1.5px solid #e7dbc6;
+    }
+    .activity-group-acts {
+      background: #f7f1e3;
+      border-radius: 0 0 1.25rem 1.25rem;
+      border: 1.5px solid #e7dbc6;
+      border-top: none;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .activity-btn {
+      border: 1.5px solid #e7dbc6 !important;
+      background: #fffaf3 !important;
+      color: #222 !important;
+      transition: background 0.15s, color 0.15s, border 0.15s;
+    }
+    .activity-btn:hover, .activity-btn:focus {
+      background: #f3e9d2 !important;
+      color: #222 !important;
+      border: 1.5px solid #e7dbc6 !important;
+    }
+    .activity-btn.selected {
+      background: #f5ede0 !important;
+      color: #222 !important;
+      border-color: #e7dbc6 !important;
+      box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10);
     }
     @media (max-width: 500px) {
       .emoji-face { font-size: 3.5rem; width: 80px; height: 80px; }
+      .heatmap-cell { width: 18px; height: 18px; font-size: 0.8rem; }
+      .heatmap-tooltip { min-width: 140px; max-width: 98vw; font-size: 0.9rem; padding: 0.7rem 0.5rem; }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4" style="background: #eaf6fb;">
+<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4" style="background: #fdf6ec;">
   <div class="w-full max-w-md card-dark rounded-3xl shadow-xl-custom p-0 overflow-hidden mt-8">
     <div class="p-6 pb-2">
       <h1 class="text-3xl font-extrabold text-center mb-2 tracking-tight">Digital Calorie Journal</h1>
-      <div class="emoji-face mb-2">🙂</div>
+      <div class="emoji-face mb-2">🔋</div>
       <div id="tabs" class="flex justify-center mb-4 gap-2">
         <button id="logTab" class="px-5 py-2 pill font-semibold bg-white text-gray-900 shadow-sm">Log Entry</button>
         <button id="summaryTab" class="px-5 py-2 pill font-semibold bg-white text-gray-900 shadow-sm">Summary</button>
       </div>
       <div id="logFormSection">
         <form id="logForm">
-          <label class="block text-lg font-semibold mb-2 text-white">How do you feel?</label>
+          <label class="block text-lg font-semibold mb-2 text-black">How do you feel?</label>
           <div class="flex justify-between mb-6 gap-2">
-            <button type="button" class="mood-btn flex-1 flex flex-col items-center px-0 py-3 pill border-0 bg-red-500 text-gray-900 text-lg font-bold shadow-sm transition-all" data-mood="bad">
+            <button type="button" class="mood-btn flex-1 flex flex-col items-center px-0 py-3 pill border-0 bg-red-100 text-gray-900 text-lg font-bold shadow-sm transition-all" data-mood="bad">
               <span class="text-3xl">😞</span>
               <span class="text-xs mt-1">Bad</span>
             </button>
-            <button type="button" class="mood-btn flex-1 flex flex-col items-center px-0 py-3 pill border-0 bg-yellow-400 text-gray-900 text-lg font-bold shadow-sm transition-all" data-mood="neutral">
+            <button type="button" class="mood-btn flex-1 flex flex-col items-center px-0 py-3 pill border-0 bg-yellow-100 text-gray-900 text-lg font-bold shadow-sm transition-all" data-mood="neutral">
               <span class="text-3xl">😐</span>
               <span class="text-xs mt-1">Neutral</span>
             </button>
-            <button type="button" class="mood-btn flex-1 flex flex-col items-center px-0 py-3 pill border-0 bg-green-400 text-gray-900 text-lg font-bold shadow-sm transition-all" data-mood="positive">
+            <button type="button" class="mood-btn flex-1 flex flex-col items-center px-0 py-3 pill border-0 bg-green-100 text-gray-900 text-lg font-bold shadow-sm transition-all" data-mood="positive">
               <span class="text-3xl">🙂</span>
               <span class="text-xs mt-1">Positive</span>
             </button>
           </div>
           <input type="hidden" name="mood" id="moodInput" required>
-          <label class="block text-lg font-semibold mb-2 text-white">What did you do? (Select all that apply)</label>
+          <!-- App/Program Used Input -->
+          <div class="relative mb-4">
+            <span class="input-app-icon" style="position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);">📱</span>
+            <input type="text" id="appUsed" name="appUsed" class="input-app" placeholder="App or program used (e.g. Instagram, Chrome)" autocomplete="off">
+          </div>
+          <label class="block text-lg font-semibold mb-2 text-black">What did you do? (Select all that apply)</label>
           <div id="activityGroups" class="mb-6">
             <!-- Activity groups will be injected here -->
           </div>
-          <label class="block text-lg font-semibold mb-2 text-white">Notes (optional)</label>
+          <label class="block text-lg font-semibold mb-2 text-black">Notes (optional)</label>
           <textarea id="notes" class="w-full border-0 rounded-2xl p-3 mb-6 bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400" rows="2" placeholder="How do you feel or what were you doing?"></textarea>
           <button type="submit" class="w-full bg-blue-400 text-gray-900 font-bold py-3 pill text-lg shadow-md hover:bg-blue-500 transition">Submit</button>
         </form>
@@ -110,11 +258,14 @@
           </div>
         </div>
         <canvas id="moodChart" class="mb-4" height="120"></canvas>
-        <button id="clearDataBtn" class="w-full bg-gray-800 text-white font-bold py-3 pill text-lg shadow-md hover:bg-red-500 transition">Clear Data</button>
+        <div class="section-header">Your Entry Timeline</div>
+        <div id="timeline" class="mb-4"></div>
+        <button id="clearDataBtn" class="w-full bg-gray-800 text-white font-bold py-3 pill text-lg shadow-md hover:bg-red-500 transition mb-2">Clear Data</button>
+        <button id="exportBtn" class="w-full bg-green-400 text-gray-900 font-bold py-3 pill text-lg shadow-md hover:bg-green-500 transition">Export to Spreadsheet</button>
       </div>
     </div>
   </div>
-  <footer class="mt-8 text-gray-400 text-xs text-center">&copy; 2024 Digital Calorie Journal</footer>
+  <footer class="mt-8 text-gray-400 text-xs text-center">&copy; 2025 Digital Calorie Project</footer>
   <script>
     // --- Activity Groups & Categories ---
     const activityGroups = [
@@ -243,12 +394,12 @@
         // Header
         const header = document.createElement('button');
         header.type = 'button';
-        header.className = `w-full flex justify-between items-center px-4 py-2 font-semibold ${color.groupText} ${color.groupBg} rounded-t-lg focus:outline-none`;
+        header.className = `activity-group-header w-full flex justify-between items-center px-4 py-2 font-semibold focus:outline-none${groupIdx === 0 ? ' activity-group-open' : ''}`;
         header.innerHTML = `<span>${group.name}</span><span class=\"ml-2\" id=\"arrow-${groupIdx}\">${groupIdx === 0 ? '▲' : '▼'}</span>`;
         headers.push(header);
         // Activities container
         const actsDiv = document.createElement('div');
-        actsDiv.className = `flex flex-wrap gap-2 p-3 ${color.actsBg} border-t ${color.groupBorder}`;
+        actsDiv.className = `activity-group-acts flex flex-wrap gap-2${groupIdx === 0 ? '' : ' hidden'}`;
         actsDiv.style.display = groupIdx === 0 ? 'flex' : 'none'; // First group open by default
         actsDivs.push(actsDiv);
         group.activities.forEach(act => {
@@ -279,10 +430,12 @@
           actsDivs.forEach((div, idx) => {
             div.style.display = 'none';
             headers[idx].querySelector('span:last-child').textContent = '▼';
+            headers[idx].classList.remove('activity-group-open');
           });
           // Open this one
           actsDiv.style.display = 'flex';
           header.querySelector('span:last-child').textContent = '▲';
+          header.classList.add('activity-group-open');
         });
         groupDiv.appendChild(header);
         groupDiv.appendChild(actsDiv);
@@ -346,9 +499,11 @@
         return;
       }
       const notes = notesInput.value.trim();
+      const appUsed = document.getElementById('appUsed').value.trim();
       const entry = {
         timestamp: new Date().toISOString(),
         mood,
+        appUsed,
         activities: selectedActivities,
         notes
       };
@@ -399,6 +554,53 @@
           }
         }
       });
+      // --- Timeline ---
+      renderTimeline(entries);
+    }
+
+    // --- Timeline Rendering ---
+    function renderTimeline(entries) {
+      const timeline = document.getElementById('timeline');
+      timeline.innerHTML = '';
+      if (!entries.length) {
+        timeline.innerHTML = '<div class="text-center text-gray-400 py-8">No entries yet. Start logging to see your timeline!</div>';
+        return;
+      }
+      // Show most recent first, up to 10
+      const recent = [...entries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
+      recent.forEach(e => {
+        const card = document.createElement('div');
+        card.className = 'mb-4 p-4 rounded-2xl shadow-xl-custom bg-white border border-yellow-100 flex flex-col gap-1';
+        // Date/time
+        const date = new Date(e.timestamp);
+        const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        // Mood
+        let moodEmoji = '🙂', moodLabel = 'Positive';
+        if (e.mood === 'bad') { moodEmoji = '😞'; moodLabel = 'Bad'; }
+        else if (e.mood === 'neutral') { moodEmoji = '😐'; moodLabel = 'Neutral'; }
+        // App icon
+        let appIcon = '📱';
+        if (e.appUsed && /discord/i.test(e.appUsed)) appIcon = '🟦';
+        else if (e.appUsed && /instagram/i.test(e.appUsed)) appIcon = '📸';
+        else if (e.appUsed && /x|twitter/i.test(e.appUsed)) appIcon = '🐦';
+        else if (e.appUsed && /tiktok/i.test(e.appUsed)) appIcon = '🎵';
+        // Card content
+        card.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-2xl">${moodEmoji}</span>
+            <span class="font-bold">${moodLabel}</span>
+            <span class="ml-auto text-xs text-gray-400">${dateStr} ${timeStr}</span>
+          </div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xl">${appIcon}</span>
+            <span class="font-semibold">${e.appUsed ? e.appUsed : '<span class=\'text-gray-400\'>(none)</span>'}</span>
+          </div>
+          <div><span class="font-semibold">Activities:</span> ${e.activities.join(', ')}</div>
+          ${e.notes ? `<div><span class="font-semibold">Notes:</span> ${e.notes}</div>` : ''}
+        `;
+        timeline.appendChild(card);
+      });
     }
 
     // --- Clear Data ---
@@ -407,6 +609,39 @@
         clearEntries();
         renderSummary();
       }
+    });
+
+    // --- Export to Spreadsheet ---
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      const entries = getEntries();
+      if (!entries.length) {
+        alert('No data to export.');
+        return;
+      }
+      const csvRows = [
+        ['Timestamp', 'Mood', 'App Used', 'Activities', 'Notes']
+      ];
+      entries.forEach(e => {
+        csvRows.push([
+          e.timestamp,
+          e.mood,
+          e.appUsed || '',
+          e.activities.join('; '),
+          (e.notes || '').replace(/\n/g, ' ')
+        ]);
+      });
+      const csvContent = csvRows.map(row => row.map(field => '"' + String(field).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'digital_calorie_journal.csv';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
     });
 
     // --- Initial State ---
